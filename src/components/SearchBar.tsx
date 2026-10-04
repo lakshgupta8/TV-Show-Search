@@ -6,16 +6,24 @@ interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   loading?: boolean;
+  autoFocus?: boolean;
+  placeholder?: string;
 }
 
-const SearchBar: FC<SearchBarProps> = ({ value, onChange, loading }) => {
+const SearchBar: FC<SearchBarProps> = ({
+  value,
+  onChange,
+  loading,
+  autoFocus = true,
+  placeholder = "Search for a TV show or person…",
+}) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Press "/" anywhere on the page to jump to the search box.
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
-      const isTyping = target.tagName === "INPUT" || target.tagName === "TEXTAREA";
+      const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
       if (event.key === "/" && !isTyping) {
         event.preventDefault();
         inputRef.current?.focus();
@@ -31,13 +39,13 @@ const SearchBar: FC<SearchBarProps> = ({ value, onChange, loading }) => {
       <input
         ref={inputRef}
         type="text"
-        autoFocus
-        aria-label="Search TV shows"
-        placeholder="Search for a TV show…"
+        autoFocus={autoFocus}
+        aria-label="Search"
+        placeholder={placeholder}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={(event) => event.key === "Escape" && onChange("")}
-        className="bg-surface shadow-lg shadow-black/30 py-4 pr-24 pl-12 border border-border-active focus:border-brand rounded-full focus:outline-none focus:ring-4 focus:ring-brand/25 w-full text-text-primary text-lg placeholder-text-muted/60 transition"
+        className="bg-surface shadow-black/30 shadow-lg py-4 pr-24 pl-12 border border-border-active focus:border-brand rounded-full focus:outline-none focus:ring-4 focus:ring-brand/25 w-full text-text-primary text-lg placeholder-text-muted/60 transition"
       />
       <div className="top-1/2 right-4 absolute flex items-center gap-3 -translate-y-1/2">
         {loading && <ImSpinner2 aria-label="Loading" className="text-brand animate-spin" />}

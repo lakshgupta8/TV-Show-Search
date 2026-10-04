@@ -4,16 +4,35 @@ A show discovery application built with a focus on robust state management. Desi
 
 ## Features
 
-- **Instant Search**: Debounced, real-time show discovery powered by the TVMaze API. Results are cached per query, and the query lives in the URL (`/?q=...`), so refreshes, shared links and the back button all restore your results.
-- **Show Details**: Poster, blurred backdrop, status, years, runtime, network, genres, rating, airing schedule and a link to the official site.
-- **Seasons**: Every season with its episode count and air dates.
+- **Home**: What's airing on US TV tonight, what's new on streaming today, the top-rated shows in the catalog, and a genre directory.
+- **Search**: Debounced, search-as-you-type for both **shows** and **people**. The query lives in the URL (`/search?q=...&type=people`), so refreshes, shared links and the back button all restore your results.
+- **Browse**: Explore the full TVmaze catalog with genre, status and language filters, sorted by popularity, rating, release date or name. More of the catalog loads on demand.
+- **Schedule**: Every episode airing on TV (by country) or released on streaming services, for any day, grouped by air time and filterable by show or network.
+- **Show Pages** with tabs:
+  - **Overview**: summary, next and latest episodes, starring cast, seasons, show info and alternate titles from around the world.
+  - **Episodes**: season picker, every episode with stills, air dates, ratings and a season average.
+  - **Cast & Crew**: the full cast with characters, and the crew grouped by role.
+  - **Gallery**: posters, backgrounds, banners and logos with a keyboard-friendly lightbox.
+- **Episode Pages**: still, summary, rating, guest stars, episode crew and previous/next navigation.
+- **Person Pages**: bio facts (born, died, age, country) and full acting and behind-the-camera filmographies.
 - **Cast Visualization**:
-  - **Avatar Stacks**: Overlapping circular avatars, with initials as a fallback when there is no photo.
+  - **Avatar Stacks**: Overlapping circular avatars that link to each person, with initials as a fallback when there is no photo.
   - **Interactive Popover**: The "+N" indicator reveals the full cast list without shifting the page (closes on outside click or `Esc`).
   - **Tooltips**: Actor and character names on hover or keyboard focus.
 - **Polished States**: Skeleton loaders, previous results kept visible while new ones load, retryable errors, and a 404 page.
 - **Keyboard Friendly**: Press `/` anywhere to focus search and `Esc` to clear it.
 - **Centralized Design System**: Color palette defined once as Tailwind CSS `@theme` tokens in `src/index.css`.
+
+## How data loading works
+
+Every TVmaze request goes through one Redux slice, `queries`, that caches responses by endpoint + argument. Components call `useQuery("showDetails", id)`, which dispatches `queryRequested`; a saga then:
+
+- skips the request if the response is already cached or in flight,
+- **debounces** search endpoints by 300 ms so typing doesn't spam the API,
+- **retries with backoff** when TVmaze's rate limit (~20 requests / 10 s) is hit,
+- stores the result with `querySucceeded` / `queryFailed`.
+
+Show pages use a single request with embedded cast, crew, seasons, episodes, images, alternate titles and next/previous episode, and every show tab reads from that one cached response.
 
 ## Tech Stack
 
@@ -28,14 +47,17 @@ A show discovery application built with a focus on robust state management. Desi
 
 ```bash
 src/
-├── components/     # Reusable UI (SearchBar, ShowCard, CastStack, SeasonList, ...)
-├── pages/          # Screens: SearchPage, ShowPage, NotFoundPage
+├── components/     # Reusable UI (SearchBar, ShowCard, PersonCard, EpisodeRow, CastStack, Rail, Lightbox, ...)
+├── pages/
+│   ├── HomePage, SearchPage, BrowsePage, SchedulePage, EpisodePage, PersonPage, NotFoundPage
+│   └── show/           # ShowLayout (hero + tabs) and the Overview, Episodes, Cast, Gallery tabs
 ├── store/
 │   ├── index.ts        # Store setup + typed hooks
-│   ├── showsSlice.ts   # Normalized shows, per-query search cache, per-show details
-│   ├── sagas.ts        # Debounced search + detail fetching
-│   └── selectors.ts    # Memoized selectors
-├── api.ts          # TVMaze client
+│   ├── queriesSlice.ts # Response cache keyed by endpoint + argument
+│   ├── sagas.ts        # Fetching, debouncing, de-duplication, rate-limit retries
+│   └── useQuery.ts     # useQuery / useQueries hooks
+├── api.ts          # TVmaze client: every endpoint the app uses
+├── constants.ts    # Genres, countries, shared classes
 ├── types.ts        # Shared TypeScript types
 ├── utils.ts        # Formatting helpers
 └── index.css       # Global styles and design-system tokens

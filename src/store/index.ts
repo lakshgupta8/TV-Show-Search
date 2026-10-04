@@ -1,16 +1,21 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import createSagaMiddleware from "redux-saga";
+import queriesReducer from "./queriesSlice";
 import { rootSaga } from "./sagas";
-import showsReducer from "./showsSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 
 export const store = configureStore({
   reducer: {
-    shows: showsReducer,
+    queries: queriesReducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(sagaMiddleware),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      // Cached API responses are large plain JSON; skip the dev-only deep checks on them.
+      immutableCheck: { ignoredPaths: ["queries"] },
+      serializableCheck: { ignoredPaths: ["queries"], ignoredActionPaths: ["payload.data"] },
+    }).concat(sagaMiddleware),
 });
 
 sagaMiddleware.run(rootSaga);

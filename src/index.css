@@ -59,3 +59,17 @@
     @apply bg-surface-active rounded-full hover:bg-surface-hover;
   }
 }
+
+@utility custom-scrollbar-x {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-surface-active) transparent;
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    @apply bg-surface-raised rounded-full hover:bg-surface-active;
+  }
+}

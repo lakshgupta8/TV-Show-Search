@@ -1,24 +1,25 @@
 import { useState, type FC } from "react";
-import type { CastMember } from "../types";
+import type { Image } from "../types";
 import { initials } from "../utils";
 
 interface AvatarProps {
-  person: CastMember["person"];
+  name: string;
+  image: Image | null;
   className?: string;
 }
 
-const Avatar: FC<AvatarProps> = ({ person, className = "" }) => {
+const Avatar: FC<AvatarProps> = ({ name, image, className = "" }) => {
   const [failed, setFailed] = useState(false);
-  const src = person.image?.medium;
+  const src = image?.medium;
 
   if (!src || failed) {
     return (
       <div
         role="img"
-        aria-label={person.name}
+        aria-label={name}
         className={`flex justify-center items-center bg-surface-raised rounded-full font-bold text-text-secondary text-sm shrink-0 ${className}`}
       >
-        {initials(person.name)}
+        {initials(name)}
       </div>
     );
   }
@@ -26,7 +27,7 @@ const Avatar: FC<AvatarProps> = ({ person, className = "" }) => {
   return (
     <img
       src={src}
-      alt={person.name}
+      alt={name}
       loading="lazy"
       onError={() => setFailed(true)}
       className={`rounded-full object-cover shrink-0 ${className}`}

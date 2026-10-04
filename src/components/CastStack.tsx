@@ -1,5 +1,6 @@
 import { useEffect, useState, type FC } from "react";
 import { BsXLg } from "react-icons/bs";
+import { Link } from "react-router-dom";
 import type { CastMember } from "../types";
 import Avatar from "./Avatar";
 
@@ -34,16 +35,18 @@ const CastStack: FC<CastStackProps> = ({ cast, max = 6 }) => {
         {visible.map((member) => (
           <li
             key={castKey(member)}
-            tabIndex={0}
-            className="group relative hover:z-20 focus:z-20 -ml-3 focus:outline-none transition-transform hover:-translate-y-1 focus:-translate-y-1"
+            className="group relative hover:z-20 focus-within:z-20 -ml-3 transition-transform hover:-translate-y-1 focus-within:-translate-y-1"
           >
-            <Avatar
-              person={member.person}
-              className="border-4 border-surface-base group-focus:border-brand w-14 h-14 transition-colors"
-            />
+            <Link to={`/person/${member.person.id}`} className="block rounded-full focus:outline-none">
+              <Avatar
+                name={member.person.name}
+                image={member.person.image}
+                className="border-4 border-surface-base group-focus-within:border-brand w-14 h-14 transition-colors"
+              />
+            </Link>
             <div
               role="tooltip"
-              className="bottom-full left-1/2 z-30 absolute bg-surface opacity-0 group-hover:opacity-100 group-focus:opacity-100 shadow-black/40 shadow-lg mb-3 px-3 py-2 border border-border-hover rounded-lg whitespace-nowrap transition-opacity -translate-x-1/2 pointer-events-none"
+              className="bottom-full left-1/2 z-30 absolute bg-surface opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 shadow-black/40 shadow-lg mb-3 px-3 py-2 border border-border-hover rounded-lg whitespace-nowrap transition-opacity -translate-x-1/2 pointer-events-none"
             >
               <p className="font-bold text-text-primary text-sm leading-tight">{member.person.name}</p>
               <p className="text-text-muted text-xs">as {member.character.name}</p>
@@ -85,19 +88,21 @@ const CastStack: FC<CastStackProps> = ({ cast, max = 6 }) => {
             </div>
             <ul className="p-1 overflow-y-auto custom-scrollbar">
               {cast.map((member) => (
-                <li
-                  key={castKey(member)}
-                  className="flex items-center gap-3 hover:bg-surface-hover/30 p-2 rounded-lg transition-colors"
-                >
-                  <Avatar person={member.person} className="border-2 border-border-active w-10 h-10" />
-                  <div className="flex flex-col min-w-0">
-                    <span className="font-semibold text-text-primary text-sm truncate">
-                      {member.person.name}
-                    </span>
-                    <span className="text-text-muted text-xs italic truncate">
-                      as {member.character.name}
-                    </span>
-                  </div>
+                <li key={castKey(member)}>
+                  <Link
+                    to={`/person/${member.person.id}`}
+                    className="flex items-center gap-3 hover:bg-surface-hover/30 p-2 rounded-lg transition-colors"
+                  >
+                    <Avatar
+                      name={member.person.name}
+                      image={member.person.image}
+                      className="border-2 border-border-active w-10 h-10"
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-semibold text-text-primary text-sm truncate">{member.person.name}</span>
+                      <span className="text-text-muted text-xs italic truncate">as {member.character.name}</span>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>

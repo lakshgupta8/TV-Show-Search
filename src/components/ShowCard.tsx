@@ -1,12 +1,20 @@
-import { memo, type FC } from "react";
+import { memo, type FC, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { Show } from "../types";
 import { channelName, stripHtml, yearRange } from "../utils";
 import Poster from "./Poster";
 import RatingBadge from "./RatingBadge";
 
-const ShowCard: FC<{ show: Show }> = ({ show }) => {
-  const meta = [yearRange(show), channelName(show)].filter(Boolean).join(" · ");
+interface ShowCardProps {
+  show: Show;
+  // Replaces the default "years · network" line, e.g. a character name or an air time.
+  subtitle?: ReactNode;
+  // Hides the summary, for horizontal rails.
+  compact?: boolean;
+}
+
+const ShowCard: FC<ShowCardProps> = ({ show, subtitle, compact }) => {
+  const meta = subtitle ?? [yearRange(show), channelName(show)].filter(Boolean).join(" · ");
 
   return (
     <Link
@@ -24,17 +32,19 @@ const ShowCard: FC<{ show: Show }> = ({ show }) => {
         </div>
       </div>
 
-      <div className="flex flex-col flex-1 gap-1.5 p-4">
+      <div className={`flex flex-col flex-1 gap-1.5 ${compact ? "p-3" : "p-4"}`}>
         <h3
           className="font-bold text-text-primary group-hover:text-accent-text leading-tight transition-colors line-clamp-1"
           title={show.name}
         >
           {show.name}
         </h3>
-        {meta && <p className="text-text-muted text-xs">{meta}</p>}
-        <p className="mt-1 text-text-secondary/80 text-sm line-clamp-3">
-          {stripHtml(show.summary) || "No summary available."}
-        </p>
+        {meta && <div className="text-text-muted text-xs line-clamp-2">{meta}</div>}
+        {!compact && (
+          <p className="mt-1 text-text-secondary/80 text-sm line-clamp-3">
+            {stripHtml(show.summary) || "No summary available."}
+          </p>
+        )}
       </div>
     </Link>
   );

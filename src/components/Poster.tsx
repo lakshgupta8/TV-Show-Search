@@ -1,4 +1,5 @@
 import { useState, type FC } from "react";
+import type { IconType } from "react-icons";
 import { BsTv } from "react-icons/bs";
 
 interface PosterProps {
@@ -6,9 +7,10 @@ interface PosterProps {
   alt: string;
   className?: string;
   loading?: "lazy" | "eager";
+  icon?: IconType;
 }
 
-const Poster: FC<PosterProps> = ({ src, alt, className = "", loading = "lazy" }) => {
+const Poster: FC<PosterProps> = ({ src, alt, className = "", loading = "lazy", icon: Icon = BsTv }) => {
   const [failed, setFailed] = useState(false);
 
   if (!src || failed) {
@@ -18,7 +20,7 @@ const Poster: FC<PosterProps> = ({ src, alt, className = "", loading = "lazy" })
         aria-label={alt}
         className={`flex flex-col justify-center items-center gap-3 bg-surface-raised p-4 text-text-muted ${className}`}
       >
-        <BsTv className="text-4xl text-brand" />
+        <Icon className="text-brand text-4xl" />
         <span className="font-semibold text-sm text-center line-clamp-2">{alt}</span>
       </div>
     );

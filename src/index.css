@@ -34,6 +34,20 @@
   }
 }
 
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-surface-base text-text-secondary antialiased;
+  }
+
+  ::selection {
+    @apply bg-accent-bg text-accent-text;
+  }
+}
+
 @utility custom-scrollbar {
   &::-webkit-scrollbar {
     width: 5px;

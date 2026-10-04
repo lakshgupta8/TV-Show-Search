@@ -4,38 +4,41 @@ A show discovery application built with a focus on robust state management. Desi
 
 ## Features
 
-- **Intelligent Search**: Real-time show discovery powered by the TVMaze API.
-- **Show Details**: Deep insights into every show, featuring rich summaries, ratings, and high-quality artwork.
+- **Instant Search**: Debounced, real-time show discovery powered by the TVMaze API. Results are cached per query, and the query lives in the URL (`/?q=...`), so refreshes, shared links and the back button all restore your results.
+- **Show Details**: Poster, blurred backdrop, status, years, runtime, network, genres, rating, airing schedule and a link to the official site.
+- **Seasons**: Every season with its episode count and air dates.
 - **Cast Visualization**:
-  - **Avatar Stacks**: Overlapping circular avatars for a compact and premium look.
-  - **Interactive Popovers**: Clickable "Remaining Cast" indicators that reveal the full actor list without page shifts.
-  - **Tooltips**: Detailed actor/character information on hover.
-- **Centralized Design System**: Scalable color palette and utility sets defined via Tailwind CSS `@theme` tokens.
-- **Advanced State Management**: Industrial-grade architecture using Redux for state consistency and Redux Saga for complex asynchronous side effects.
-- **Robust Error Handling**: Elegant handling of missing data, 404s, and loading states to ensure a smooth user journey.
+  - **Avatar Stacks**: Overlapping circular avatars, with initials as a fallback when there is no photo.
+  - **Interactive Popover**: The "+N" indicator reveals the full cast list without shifting the page (closes on outside click or `Esc`).
+  - **Tooltips**: Actor and character names on hover or keyboard focus.
+- **Polished States**: Skeleton loaders, previous results kept visible while new ones load, retryable errors, and a 404 page.
+- **Keyboard Friendly**: Press `/` anywhere to focus search and `Esc` to clear it.
+- **Centralized Design System**: Color palette defined once as Tailwind CSS `@theme` tokens in `src/index.css`.
 
 ## Tech Stack
 
-- **Core**: React 18, TypeScript
-- **State Management**: Redux, Redux Saga, Reselect (for optimized selectors)
+- **Core**: React 18, TypeScript, Vite
+- **State Management**: Redux Toolkit (`createSlice`, `createEntityAdapter`, `createSelector`) + Redux Saga for async side effects
+- **Routing**: React Router
 - **Styling**: Tailwind CSS v4 (with custom `@theme` tokens)
-- **Networking**: Axios
-- **Parsing**: `html-react-parser` for HTML content
+- **Parsing**: `html-react-parser` for HTML summaries
 - **API**: [TVMaze API](https://www.tvmaze.com/api)
 
 ## Project Architecture
 
 ```bash
 src/
-├── Actions/        # Redux action creators
-├── Components/     # Reusable UI components (CastGroup, SearchBar, etc.)
-├── Models/         # TypeScript interfaces and types
-├── Pages/          # Main application screens (List, Details)
-├── Reducers/       # Redux state logic with Immer
-├── Sagas/          # Side effect management
-├── Selectors/      # Memoized state selectors
-├── api.ts          # API client configuration
-└── index.css       # Global styles and Design System tokens
+├── components/     # Reusable UI (SearchBar, ShowCard, CastStack, SeasonList, ...)
+├── pages/          # Screens: SearchPage, ShowPage, NotFoundPage
+├── store/
+│   ├── index.ts        # Store setup + typed hooks
+│   ├── showsSlice.ts   # Normalized shows, per-query search cache, per-show details
+│   ├── sagas.ts        # Debounced search + detail fetching
+│   └── selectors.ts    # Memoized selectors
+├── api.ts          # TVMaze client
+├── types.ts        # Shared TypeScript types
+├── utils.ts        # Formatting helpers
+└── index.css       # Global styles and design-system tokens
 ```
 
 ## Getting Started
@@ -65,6 +68,12 @@ src/
 
    ```bash
    bun dev
+   ```
+
+4. Build for production:
+
+   ```bash
+   bun run build
    ```
 
 ---

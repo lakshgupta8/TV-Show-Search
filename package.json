@@ -1,36 +1,31 @@
 {
   "name": "codeyogi-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.11.2",
-    "axios": "^1.14.0",
     "html-react-parser": "^5.2.17",
-    "immer": "^11.1.4",
-    "normalizr": "^3.6.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^4.12.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.30.3",
-    "redux-saga": "^1.4.2",
-    "reselect": "^4.1.8"
+    "redux-saga": "^1.4.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",
+    "@types/node": "^22.10.0",
     "@types/react": "^18.3.28",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^6.0.1",
-    "autoprefixer": "^10.4.27",
-    "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
-    "typescript": "^4.9.5",
+    "typescript": "~5.9.3",
     "vite": "^8.0.3"
   }
 }

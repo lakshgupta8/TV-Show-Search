@@ -1,41 +1,35 @@
-import axios from "axios";
-import type { Show, Cast } from "./Models/shows";
+import type { CastMember, Season, Show, ShowExtras } from "./types";
 
-const baseUrl = "https://api.tvmaze.com";
+const BASE_URL = "https://api.tvmaze.com";
 
-export const fetchShows = async (keywordOrId: string | number): Promise<Show[]> => {
-    try {
-        let shows: Show[] = [];
+export class NotFoundError extends Error {}
 
-        if (typeof keywordOrId === "string") {
-            const response = await axios.get<{ show: Show }[]>(
-                `${baseUrl}/search/shows?q=${keywordOrId}`
-            );
-            shows = response.data.map((item: { show: Show }) => item.show);
-        } else {
-            // Single show detail fallback
-            const response = await axios.get<Show>(
-                `${baseUrl}/shows/${keywordOrId}`
-            );
-            if (response.data) shows = [response.data];
-        }
+async function get<T>(path: string): Promise<T> {
+  const response = await fetch(`${BASE_URL}${path}`);
+  if (response.status === 404) throw new NotFoundError("Show not found");
+  if (response.status === 429) throw new Error("Too many requests — please wait a moment and try again.");
+  if (!response.ok) throw new Error(`Request failed with status ${response.status}`);
+  return response.json() as Promise<T>;
+}
 
-        const promises = shows.map(async (show) => {
-            try {
-                const castResponse = await axios.get<Cast[]>(
-                    `${baseUrl}/shows/${show.id}/cast`
-                );
-                show.cast = castResponse.data;
-            } catch (e) {
-                show.cast = [];
-            }
-            return show;
-        });
+export async function searchShows(query: string): Promise<Show[]> {
+  const results = await get<{ score: number; show: Show }[]>(
+    `/search/shows?q=${encodeURIComponent(query)}`
+  );
+  return results.map((result) => result.show);
+}
 
-        return Promise.all(promises);
-    } catch (error) {
-        console.log(error);
-        return [];
-    }
+type ShowWithEmbeds = Show & {
+  _embedded?: { cast?: CastMember[]; seasons?: Season[] };
 };
 
+// One request returns the show together with its cast and seasons.
+export async function fetchShow(id: number): Promise<{ show: Show; extras: ShowExtras }> {
+  const { _embedded, ...show } = await get<ShowWithEmbeds>(
+    `/shows/${id}?embed[]=cast&embed[]=seasons`
+  );
+  return {
+    show,
+    extras: { cast: _embedded?.cast ?? [], seasons: _embedded?.seasons ?? [] },
+  };
+}
